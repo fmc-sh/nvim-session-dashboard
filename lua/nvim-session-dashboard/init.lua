@@ -1,4 +1,4 @@
--- lua/nvim-session-dashboard/init.lua
+-- lua/hello-world/init.lua
 local M = {}
 M.config = {
 	sessions_dir = vim.fn.expand("~/.vim-sessions"), -- Default sessions directory
