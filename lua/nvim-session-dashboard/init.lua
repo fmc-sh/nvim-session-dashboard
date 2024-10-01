@@ -112,14 +112,19 @@ end
 
 -- Function to create a new session
 function M.create_new_session()
-	local session_name = vim.fn.input("New session name: ")
-	if session_name ~= "" then
+	-- Get the current working directory and replace slashes with underscores
+	local cwd = vim.fn.getcwd()
+	local session_name = cwd:gsub("/", "_")
+
+	-- Confirm creation of the new session with the generated name
+	local confirm = vim.fn.input("Create session with name '" .. session_name .. "' (y/n)? ")
+	if confirm:lower() == "y" then
 		local session_path = M.config.sessions_dir .. "/" .. session_name
 		vim.cmd("Obsession " .. session_path)
 		print("Created new session: " .. session_name)
 		vim.cmd("bd") -- Close the session buffer
 	else
-		print("Session name cannot be empty")
+		print("Session creation cancelled")
 	end
 end
 
