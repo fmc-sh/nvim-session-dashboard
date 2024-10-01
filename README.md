@@ -5,3 +5,10 @@ Personal system for displaying a dashboard with a list of nvim sessions created 
 Allows to select one of or create a new one.
 
 Displays some ascii art.
+
+
+## Settings
+
+```vim
+settings_dir = '~/.vim-sessions'
+```
