@@ -1,4 +1,4 @@
--- lua/hello-world/init.lua
+-- lua/nvim-session-dashboard/init.lua
 local M = {}
 M.config = {
 	sessions_dir = vim.fn.expand("~/.vim-sessions"), -- Default sessions directory
@@ -70,7 +70,7 @@ function M.show_session_buffer()
 		buf,
 		"n",
 		"n",
-		[[:lua require('hello-world').create_new_session()<CR>]],
+		[[:lua require('nvim-session-dashboard').create_new_session()<CR>]],
 		{ noremap = true, silent = true }
 	)
 	vim.api.nvim_buf_set_keymap(buf, "n", "q", ":q<CR>", { noremap = true, silent = true })
@@ -78,7 +78,7 @@ function M.show_session_buffer()
 		buf,
 		"n",
 		"r",
-		[[:lua require('hello-world').show_session_buffer()<CR>]],
+		[[:lua require('nvim-session-dashboard').show_session_buffer()<CR>]],
 		{ noremap = true, silent = true }
 	) -- Reload key mapping
 
@@ -88,7 +88,7 @@ function M.show_session_buffer()
 			buf,
 			"n",
 			index_label,
-			[[:lua require('hello-world').load_session(]] .. i .. [[)<CR>]],
+			[[:lua require('nvim-session-dashboard').load_session(]] .. i .. [[)<CR>]],
 			{ noremap = true, silent = true }
 		)
 	end
