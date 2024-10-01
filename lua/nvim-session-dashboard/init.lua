@@ -45,7 +45,6 @@ local function get_index_label(index)
 	end
 end
 
--- Function to show session buffer
 function M.show_session_buffer()
 	local sessions = list_sessions()
 	local buf = vim.api.nvim_create_buf(false, true) -- Create a new empty buffer
@@ -71,7 +70,7 @@ function M.show_session_buffer()
 		buf,
 		"n",
 		"n",
-		[[:lua require('nvim-session-dashboard').create_new_session()<CR>]],
+		[[:lua require('hello-world').create_new_session()<CR>]],
 		{ noremap = true, silent = true }
 	)
 	vim.api.nvim_buf_set_keymap(buf, "n", "q", ":q<CR>", { noremap = true, silent = true })
@@ -79,7 +78,7 @@ function M.show_session_buffer()
 		buf,
 		"n",
 		"r",
-		[[:lua require('nvim-session-dashboard').show_session_buffer()<CR>]],
+		[[:lua require('hello-world').show_session_buffer()<CR>]],
 		{ noremap = true, silent = true }
 	) -- Reload key mapping
 
@@ -89,10 +88,19 @@ function M.show_session_buffer()
 			buf,
 			"n",
 			index_label,
-			[[:lua require('nvim-session-dashboard').load_session(]] .. i .. [[)<CR>]],
+			[[:lua require('hello-world').load_session(]] .. i .. [[)<CR>]],
 			{ noremap = true, silent = true }
 		)
 	end
+
+	-- Temporarily highlight all lines
+	local ns_id = vim.api.nvim_create_namespace("session_highlight")
+	vim.api.nvim_buf_add_highlight(buf, ns_id, "Visual", 0, 0, -1)
+
+	-- Schedule removal of highlight after half a second
+	vim.defer_fn(function()
+		vim.api.nvim_buf_clear_namespace(buf, ns_id, 0, -1)
+	end, 500)
 end
 
 -- Function to load a selected session
