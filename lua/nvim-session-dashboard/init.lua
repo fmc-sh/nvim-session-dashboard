@@ -1,3 +1,4 @@
+-- lua/hello-world/init.lua
 local M = {}
 M.config = {
 	sessions_dir = vim.fn.expand("~/.vim-sessions"), -- Default sessions directory
@@ -82,36 +83,15 @@ function M.show_session_buffer()
 		{ noremap = true, silent = true }
 	) -- Reload key mapping
 
-	-- Link-like behavior: map <CR> to the corresponding session loading or action
-	vim.api.nvim_buf_set_keymap(
-		buf,
-		"n",
-		"<CR>",
-		[[<Cmd>lua require('nvim-session-dashboard').select_session_by_line()<CR>]],
-		{ noremap = true, silent = true }
-	)
-end
-
--- Function to select and load the session based on the current cursor line
-function M.select_session_by_line()
-	local current_line = vim.fn.line(".") -- Get the current line number
-	local sessions = list_sessions()
-
-	if current_line == #sessions + 4 then
-		print("New session selected")
-		M.create_new_session()
-	elseif current_line == #sessions + 5 then
-		print("Reloading session view")
-		M.show_session_buffer()
-	elseif current_line == #sessions + 6 then
-		print("Exiting session view")
-		vim.cmd("q")
-	elseif current_line > 1 and current_line <= #sessions + 1 then
-		local session_index = current_line - 1
-		print("Loading session: " .. sessions[session_index])
-		M.load_session(session_index)
-	else
-		print("Invalid selection")
+	for i = 1, #sessions do
+		local index_label = get_index_label(i)
+		vim.api.nvim_buf_set_keymap(
+			buf,
+			"n",
+			index_label,
+			[[:lua require('nvim-session-dashboard').load_session(]] .. i .. [[)<CR>]],
+			{ noremap = true, silent = true }
+		)
 	end
 end
 
