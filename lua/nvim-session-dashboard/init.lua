@@ -45,6 +45,7 @@ local function get_index_label(index)
 	end
 end
 
+-- Function to show session buffer
 function M.show_session_buffer()
 	local sessions = list_sessions()
 	local buf = vim.api.nvim_create_buf(false, true) -- Create a new empty buffer
@@ -92,15 +93,6 @@ function M.show_session_buffer()
 			{ noremap = true, silent = true }
 		)
 	end
-
-	-- Temporarily highlight all lines
-	local ns_id = vim.api.nvim_create_namespace("session_highlight")
-	vim.api.nvim_buf_add_highlight(buf, ns_id, "Visual", 0, 0, -1)
-
-	-- Schedule removal of highlight after half a second
-	vim.defer_fn(function()
-		vim.api.nvim_buf_clear_namespace(buf, ns_id, 0, -1)
-	end, 500)
 end
 
 -- Function to load a selected session
