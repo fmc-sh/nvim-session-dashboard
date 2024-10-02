@@ -1,4 +1,3 @@
--- lua/hello-world/init.lua
 local M = {}
 M.config = {
 	sessions_dir = vim.fn.expand("~/.vim-sessions"), -- Default sessions directory
@@ -10,17 +9,15 @@ function M.setup(options)
 end
 
 local sort_order = "mtime" -- Change to "alpha" for alphabetical order
+local session_tab = nil -- Variable to store the session tab number
 
 -- Function to list sessions based on the chosen order
 local function list_sessions()
 	local sessions = vim.fn.globpath(M.config.sessions_dir, "*")
-
 	if #sessions == 0 then
 		return {}
 	end
-
 	local session_list = vim.split(sessions, "\n")
-
 	if sort_order == "mtime" then
 		-- Sort by file modification time (descending order)
 		table.sort(session_list, function(a, b)
@@ -30,7 +27,6 @@ local function list_sessions()
 		-- Sort alphabetically
 		table.sort(session_list)
 	end
-
 	return session_list
 end
 
@@ -42,6 +38,30 @@ local function get_index_label(index)
 		return "0" -- Number 10 is "0"
 	else
 		return string.char(86 + index) -- 11 -> 'a', 12 -> 'b', etc., using ASCII
+	end
+end
+
+-- Function to clear session tab reference when it's invalid
+local function clear_session_tab()
+	session_tab = nil
+end
+
+-- Function to create the session buffer and open it in a new tab
+local function create_session_tab()
+	vim.cmd("tabnew")
+	session_tab = vim.api.nvim_get_current_tabpage()
+	M.show_session_buffer()
+end
+
+-- Function to toggle the session dashboard
+function M.toggle_session_dashboard()
+	if session_tab and vim.api.nvim_tabpage_is_valid(session_tab) then
+		-- Close the session dashboard tab and move to the next tab
+		vim.cmd("tabclose " .. vim.api.nvim_tabpage_get_number(session_tab))
+		session_tab = nil
+	else
+		-- Create a new session dashboard tab if it doesn't exist
+		create_session_tab()
 	end
 end
 
@@ -95,7 +115,7 @@ function M.show_session_buffer()
 	end
 end
 
--- Function to load a selected session
+-- Function to load a selected session and close the session tab
 function M.load_session(index)
 	local sessions = list_sessions()
 	if sessions[index] then
@@ -103,8 +123,8 @@ function M.load_session(index)
 
 		vim.cmd("%bd") -- Close all open buffers
 		vim.cmd("silent! only") -- Close all windows except the current one
-
 		vim.cmd("source " .. session_path)
+		clear_session_tab() -- Clear the session tab reference since it's no longer relevant
 	else
 		print("Invalid session index")
 	end
@@ -123,6 +143,7 @@ function M.create_new_session()
 		vim.cmd("Obsession " .. session_path)
 		print("Created new session: " .. session_name)
 		vim.cmd("bd") -- Close the session buffer
+		clear_session_tab() -- Clear the session tab after creation
 	else
 		print("Session creation cancelled")
 	end
@@ -132,7 +153,7 @@ end
 vim.api.nvim_create_autocmd("VimEnter", {
 	callback = function()
 		if vim.fn.argc() == 0 then -- Only if no files are opened
-			M.show_session_buffer()
+			create_session_tab()
 		end
 	end,
 })
